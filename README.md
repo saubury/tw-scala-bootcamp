@@ -4,6 +4,7 @@ The _first time_ you do this it'll build an image; and will take around 20 minut
 ```
 docker-compose up -d
 ```
+For more details on what is in the image, see [here](docker/README.md)
 
 ## Login 
 ```
@@ -12,6 +13,8 @@ cd /scripts
 
 ```
 
+## Developing in Scala
+See guide [here](scripts/README.md)
 
 ## Shutdown
 When finished
