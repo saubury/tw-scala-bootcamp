@@ -1,0 +1,18 @@
+---
+version: '3'
+
+services:
+ 
+  scalaplay:
+    image: 'twa/scalaplay:latest'
+    build:
+      context: docker/
+    hostname: scalaplay
+    environment:
+      TZ: ${TZ_SET}      
+    volumes:
+      - ./scripts:/scripts
+    extra_hosts:
+      - "moby:127.0.0.1"      
+
+ 
