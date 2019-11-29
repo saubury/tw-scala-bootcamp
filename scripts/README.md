@@ -4,6 +4,11 @@ This document covers the following getting started topics:
 - Making Hello World
 - Variables with Vals and Vars
 - Scala Types
+- Reading Input
+- Splitting strings
+- Use a sliding window on an Array
+
+Before we get started, we want to set the scene with this scenario [Moving Averages](https://git.thoughtworks.net/afraser/moving_averages)
 
 1. REPL and Hello World
     
@@ -47,8 +52,7 @@ This document covers the following getting started topics:
     
         java -classpath /usr/share/scala-2.11/lib/scala-library.jar:. HelloWorld2
 
-
-2. Variables with Vals and Vars
+3. Variables with Vals and Vars
     
     In scala, 
     - Use var keyword to declare a variable that is mutable
@@ -58,6 +62,41 @@ This document covers the following getting started topics:
     
     See explanation from Dick Wall [here](https://drive.google.com/open?id=1QDwUvuXvw9LelKeWS27PQ2XBWuEmzRzi)
 
-3. Scala Types
+4. Scala Types
 
     See explanation from Dick Wall [here](https://drive.google.com/open?id=12USAowhtmiDYDFMNUvo2TRUcbP90bDZV)
+
+5. Reading Input
+
+    To read input from the console use:
+    
+        import scala.io.{Source, StdIn}
+        object HelloWorld3 {
+        
+          def main(args: Array[String]) {
+        
+            // Read Input data
+            val input = StdIn.readLine()
+            println(input)
+          }
+        }
+
+6. Splitting strings
+
+    To process text, add a method to do it
+        
+        def stringToDoubles(input: String, delimiter: String): Array[Double] = {
+            input.split(delimiter).map(_.toDouble)
+        }
+
+7. Use a sliding window cunction
+
+    We can then create a method to perform a series of maps:
+
+        def getMovingAvg(inputValues: Array[Double], windowSize: Int): Array[Double] ={
+            inputValues.sliding(windowSize)
+                .map(_.sum)
+                .map(_ / windowSize)
+                .toArray
+        }
+
