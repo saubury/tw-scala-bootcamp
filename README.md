@@ -7,7 +7,7 @@ docker-compose up -d
 
 ## Login 
 ```
-docker-compose exec scalaplay bash
+docker-compose exec scala_machine bash
 cd /scripts
 
 ```

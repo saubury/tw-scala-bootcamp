@@ -2,12 +2,12 @@
 version: '3'
 
 services:
- 
-  scalaplay:
-    image: 'twa/scalaplay:latest'
+
+  scala_machine:
+    image: 'twa/scala:latest'
     build:
       context: docker/
-    hostname: scalaplay
+    hostname: scala_machine
     environment:
       TZ: ${TZ_SET}      
     volumes:

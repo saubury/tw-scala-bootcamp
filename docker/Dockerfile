@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 LABEL version="1.0"
-LABEL description="TWA Scala 101"
+LABEL description="TWA Scala DE150"
 
 RUN apt-get update && apt-get install -y \
   openjdk-8-jdk \
@@ -15,7 +15,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B
 
 RUN apt-get update && apt-get install -y sbt
 
-RUN cd /tmp && sbt new sbt/scala-seed.g8
+RUN cd /tmp && echo my_project | sbt new sbt/scala-seed.g8
 
 # I know you are not supposed to do this, it's not very docker-like
 ENTRYPOINT ["tail", "-f", "/dev/null"]
