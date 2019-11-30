@@ -19,7 +19,7 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
         Welcome to Scala 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_222).
         Type in expressions for evaluation. Or try :help.
     
-        scala>println(“Hello”)
+        scala>println("Hello")
         Hello
     
 2. Making Hello World
