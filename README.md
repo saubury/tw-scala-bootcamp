@@ -28,3 +28,9 @@ To rebuild this image
 ```
 docker-compose build
 ```
+
+## Docker remove image
+If you never need this again
+```
+docker rmi twa/scala
+```
