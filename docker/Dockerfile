@@ -6,9 +6,13 @@ LABEL description="TWA Scala DE150"
 RUN apt-get update && apt-get install -y \
   openjdk-11-jdk-headless \
   vim \
-  scala \
   wget \
   gnupg 
+
+# the latest scala isn't available via apt
+RUN wget https://downloads.lightbend.com/scala/2.13.1/scala-2.13.1.deb \
+  && dpkg -i scala-2.13.1.deb \
+  && rm scala-2.13.1.deb
 
 RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
 
