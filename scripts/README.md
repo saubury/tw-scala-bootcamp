@@ -22,6 +22,8 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
         scala>println("Hello")
         Hello
     
+    HINT: Press Ctrl+C to exit from REPL and return to bash shell
+    
 2. Variables with Vals and Vars
     
     In scala,
@@ -39,6 +41,8 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
 4. Collections
 
     Scala has versatile collections support. Let's count word frequencies in the REPL.
+    
+    *Optional* - See explanation from Dick Wall [here](https://drive.google.com/open?id=1dGKnQThxeiinDuwmFaw7tIsrjaaC1PSN)
 
     We'll start with some text from [this book](https://www.gutenberg.org/files/11/11-h/11-h.htm#link2HCH0001).
 
@@ -84,130 +88,167 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
 
 5. Moving beyond the REPL writing programs, compiling and running
 
-    Let's make a program, create a text file like so:
+    Let's make a simple hello world program, create a text file like so:
     
-        cat > HelloWorld2.scala << EOF
-        object HelloWorld2 {
-          def main(args: Array[String]): Unit = {
-            println("Hello, world!")
-          }
-        }
-        EOF
+       cat > HelloWorld2.scala << EOF
+       object HelloWorld2 {
+         def main(args: Array[String]): Unit = {
+           println("Hello, world!")
+         }
+       }
+       EOF
     
     Compile it
     
-        scalac  HelloWorld2.scala
+       scalac  HelloWorld2.scala
     
     Note the additional file, its complicated, but the class with the $ has the concrete implementation.
     
-        root@6be6a0df45c1:/# ls -l HelloWorld2*
-        -rw-r--r-- 1 root root 637 Nov 28 00:30 'HelloWorld2$.class'
-        -rw-r--r-- 1 root root 586 Nov 28 00:30  HelloWorld2.class
-        -rw-r--r-- 1 root root  97 Nov 28 00:29  HelloWorld2.scala
+       ls -l HelloWorld2*
+       -rw-r--r-- 1 root root 637 Nov 28 00:30 'HelloWorld2$.class'
+       -rw-r--r-- 1 root root 586 Nov 28 00:30  HelloWorld2.class
+       -rw-r--r-- 1 root root  97 Nov 28 00:29  HelloWorld2.scala
     
     Let's run it
     
-        scala  HelloWorld2
+       scala  HelloWorld2
     
     To reinforce the point Scala is built as a library on top of Java, you can run your scala code with the JRE if you include the scala library in the classpath
     
-        java -classpath /usr/share/scala-2.11/lib/scala-library.jar:. HelloWorld2
+        java -classpath /usr/share/scala/lib/scala-library.jar:. HelloWorld2
 
 6. Using a build tool (sbt)
     
     With scala projects, it is common to use the `Simple build tool` commonly known as `sbt`. This is akin to maven in the java world or rake in the ruby world.
     
+    Create a folder for your project
+    
+       mkdir my_project
+       cd my_project
+    
     This should be installed in the docker image. To get started, we need to make a build configuration called `build.sbt`
 
-        cat > build.sbt << EOF
-            name := "HelloWorld3"
-            version := "0.1"
-            scalaVersion := "2.12.7"
-        EOF
+       cat > build.sbt << EOF
+       name := "HelloWorld3"
+       version := "0.1"
+       scalaVersion := "2.13.1"
+       EOF
 
     We can then use commands with sbt like:
     
-    - sbt package
-    - sbt run
+    - sbt package (compiles source and produces a JAR file in ./target/scala-2.13/)
+    - sbt run (executes the main() function from the source code)
 
     We can add dependencies to the project by adding ines like:
     
-        cat >> build.sbt << EOF
-            libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.5" % "test"
-        EOF
+       cat >> build.sbt << EOF
+       libraryDependencies += "org.scalatest" % "scalatest_2.13" % "3.1.0" % "test"
+       EOF
     
-    `sbt` also supports plug-ins that provide additional funcationality such as making runnable JAR's but we wont cover them here.
+    `sbt` also supports plug-ins that provide additional functionality such as making runnable JAR's but we wont cover them here.
     
-7. Reading Input
+    Notice the JAR dependency that is downloaded. This is stored in a local ivy2 cache to speed up build times. See:
+    
+        ls -al ~
+        drwxr-xr-x 3 root root 4096 Dec  2 00:55 .ivy2
+        
+        find ~/.ivy2/ -type f -name *test*
+        /root/.ivy2/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar
+        /root/.ivy2/cache/org.scala-sbt/test-agent/jars/test-agent-1.3.4.jar
+        /root/.ivy2/cache/org.scala-sbt/testing_2.12/jars/testing_2.12-1.3.4.jar
 
+7. Reading Input
+    Create a new program
+    
     To read input from the console use:
     
-        import scala.io.{Source, StdIn}
+       mkdir -p src/main/scala
+       cat > src/main/scala/HelloWorld3.scala <<EOF
+       import scala.io.{Source, StdIn}
         
-        object HelloWorld3 {
+       object HelloWorld3 {
         
-          def main(args: Array[String]) {
-        
-            // Read Input data
-            val input = StdIn.readLine()
-            println(input)
-          }
-        }
+         def main(args: Array[String]) {
+           print("Type in some input:")
+           val input = StdIn.readLine()
+           println(s"You entered: \${input}")
+         }
+       }
+       EOF
 
+    Run this with
+    
+        sbt run
+        
+    *Note* scala string interpolation syntax with the quotes prefixed with `s`
+    Scala supports custom interpolators but we wont go into depth about that here.
+    
 8. Splitting strings
 
     We first need to start with a test, so lets try:
-    
-        cat > HelloWorld3Test.scala << EOF
-            import org.scalatest.FlatSpec
+
+       mkdir -p src/test/scala
+
+       cat > src/test/scala/HelloWorld3Test.scala << EOF
+       import org.scalatest.FlatSpec
             
-            class HelloWorld3Test extends FlatSpec {
-              "String to Array of doubles" should "return an array" in {
-                // Given
-                val input = "1 2 3 4 5"
-                val expected = Array(1,2,3,4,5).map(_.toDouble)
-                // When
-                val result = HelloWorld3.stringToDoubles(input, " ")
-                // Then
-                assert(result sameElements expected)
-              }
-            }
-            EOF
+       class HelloWorld3Test extends FlatSpec {
+         "String to Array of doubles" should "return an array" in {
+           val input = "1 2 3 4 5"
+           val expected = Array(1,2,3,4,5).map(_.toDouble)
+           val result = HelloWorld3.stringToDoubles(input, " ")
+           assert(result sameElements expected)
+         }
+       }
+       EOF
 
     To test, run:
 
         sbt test
 
-    To make the test pass and process the text, implement the method to do it
-        
-        def stringToDoubles(input: String, delimiter: String): Array[Double] =
-            input.split(delimiter).map(_.toDouble)
+    Notice it fails with `stringToDoubles is not a member of object HelloWorld3`
+    
+    To make the test pass, implement the method like so:
+       
+       head -n -1 src/main/scala/HelloWorld3.scala > src/main/scala/HelloWorld3.txt
+       mv src/main/scala/HelloWorld3.txt src/main/scala/HelloWorld3.scala 
+       cat >> src/main/scala/HelloWorld3.scala << EOF
+
+         def stringToDoubles(input: String, delimiter: String): Array[Double] =
+           input.split(delimiter).map(_.toDouble)
+       }
+       EOF
 
 9. Use a sliding window function
 
     We now need a method to calculate the average over a sliding window, so lets start with a test for this:
     
-        head -n -1 HelloWorld3Test.scala > HelloWorld3Test.txt ; mv HelloWorld3Test.txt HelloWorld3Test.scala
-        cat >> HelloWorld3Test.scala << EOF
-              "getMovingAvg with 3" should "return an array of doubles based on window size of 3" in {
-                // Given ..
-                val input = (1 to 100).map(_.toDouble).toArray
-                val expected = (2 to 99).map(_.toDouble).toArray
-                // When ..
-                val result = Calculator.getMovingAvg(input, 3)
-                // Then ..
-                assert(result sameElements expected)
-              }
-              }
-              EOF
+       head -n -1 src/test/scala/HelloWorld3Test.scala > src/test/scala/HelloWorld3Test.txt
+       mv src/test/scala/HelloWorld3Test.txt src/test/scala/HelloWorld3Test.scala
+       cat >> src/test/scala/HelloWorld3Test.scala << EOF
+         
+         "getMovingAvg with 3" should "return an array of doubles based on window size of 3" in {
+           val input = (1 to 100).map(_.toDouble).toArray
+           val expected = (2 to 99).map(_.toDouble).toArray
+           val result = HelloWorld3.getMovingAvg(input, 3)
+           assert(result sameElements expected)
+         }
+       }
+       EOF
             
     We can then create a method to perform a series of maps:
 
-        def getMovingAvg(inputValues: Array[Double], windowSize: Int): Array[Double] =
-            inputValues.sliding(windowSize)
-                .map(_.sum)
-                .map(_ / windowSize)
-                .toArray
+       head -n -1 src/main/scala/HelloWorld3.scala > src/main/scala/HelloWorld3.txt
+       mv src/main/scala/HelloWorld3.txt src/main/scala/HelloWorld3.scala 
+       cat >> src/main/scala/HelloWorld3.scala << EOF
+
+         def getMovingAvg(inputValues: Array[Double], windowSize: Int): Array[Double] =
+           inputValues.sliding(windowSize)
+             .map(_.sum)
+             .map(_ / windowSize)
+             .toArray
+       }
+       EOF
 
     Now run the tests to make sure they pass:
 
@@ -226,10 +267,16 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
     Add the following lines:
     
         // Parse the input
-        val data = stringToDoubles(input, delimiter)
+        val data = stringToDoubles(input, " ")
     
         // Call Calculator.getMovingAvg()
-        val result = getMovingAvg(data, windowSize)
+        val result = getMovingAvg(data, 3)
 
         // Format the output
-        println(result.mkString(delimiter))
+        println(result.mkString(" "))
+
+    Try using sed to replace lines mid-file or use your favourite text editor:
+        
+        sed -i 's/println(s"You entered: \${input}")/val data = stringToDoubles(input, " ")\n===/g' src/main/scala/HelloWorld3.scala
+        sed -i 's/===/    val result = getMovingAvg(data, 3)\n===/g' src/main/scala/HelloWorld3.scala
+        sed -i 's/===/    println(s"Result: \${result.mkString(" ")}")\n/g' src/main/scala/HelloWorld3.scala
