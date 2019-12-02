@@ -36,7 +36,6 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
 
     See explanation from Dick Wall [here](https://drive.google.com/open?id=12USAowhtmiDYDFMNUvo2TRUcbP90bDZV)
 
-
 4. Collections
 
     Scala has versatile collections support. Let's count word frequencies in the REPL.
@@ -83,7 +82,7 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
 
         res2: scala.collection.immutable.Map[String,Int] = HashMap(in -> 1, whether -> 1, ran -> 1, a -> 2, getting -> 1, eyes -> 1, by -> 1, with -> 1, could -> 1, hot -> 1, close -> 1, trouble -> 1, for -> 1, picking -> 1, feel -> 1, would -> 1, pleasure -> 1, suddenly -> 1, own -> 1, up -> 1, so -> 1, as -> 2, well -> 1, she -> 2, daisies -> 1, making -> 1, was -> 1, mind -> 1, worth -> 1, be -> 1, her -> 3, stupid -> 1, pink -> 1, made -> 1, very -> 1, white -> 1, considering -> 1, when -> 1, day -> 1, of -> 2, and -> 2, sleepy -> 1, rabbit -> 1, daisy-chain -> 1, the -> 4)
 
-5. Moving beyond the REPL
+5. Moving beyond the REPL writing programs, compiling and running
 
     Let's make a program, create a text file like so:
     
@@ -114,7 +113,32 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
     
         java -classpath /usr/share/scala-2.11/lib/scala-library.jar:. HelloWorld2
 
-6. Reading Input
+6. Using a build tool (sbt)
+    
+    With scala projects, it is common to use the `Simple build tool` commonly known as `sbt`. This is akin to maven in the java world or rake in the ruby world.
+    
+    This should be installed in the docker image. To get started, we need to make a build configuration called `build.sbt`
+
+        cat > build.sbt << EOF
+            name := "HelloWorld3"
+            version := "0.1"
+            scalaVersion := "2.12.7"
+        EOF
+
+    We can then use commands with sbt like:
+    
+    - sbt package
+    - sbt run
+
+    We can add dependencies to the project by adding ines like:
+    
+        cat >> build.sbt << EOF
+            libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.5" % "test"
+        EOF
+    
+    `sbt` also supports plug-ins that provide additional funcationality such as making runnable JAR's but we wont cover them here.
+    
+7. Reading Input
 
     To read input from the console use:
     
@@ -130,15 +154,53 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
           }
         }
 
-7. Splitting strings
+8. Splitting strings
 
-    To process text, add a method to do it
+    We first need to start with a test, so lets try:
+    
+        cat > HelloWorld3Test.scala << EOF
+            import org.scalatest.FlatSpec
+            
+            class HelloWorld3Test extends FlatSpec {
+              "String to Array of doubles" should "return an array" in {
+                // Given
+                val input = "1 2 3 4 5"
+                val expected = Array(1,2,3,4,5).map(_.toDouble)
+                // When
+                val result = HelloWorld3.stringToDoubles(input, " ")
+                // Then
+                assert(result sameElements expected)
+              }
+            }
+            EOF
+
+    To test, run:
+
+        sbt test
+
+    To make the test pass and process the text, implement the method to do it
         
         def stringToDoubles(input: String, delimiter: String): Array[Double] =
             input.split(delimiter).map(_.toDouble)
 
-8. Use a sliding window function
+9. Use a sliding window function
 
+    We now need a method to calculate the average over a sliding window, so lets start with a test for this:
+    
+        head -n -1 HelloWorld3Test.scala > HelloWorld3Test.txt ; mv HelloWorld3Test.txt HelloWorld3Test.scala
+        cat >> HelloWorld3Test.scala << EOF
+              "getMovingAvg with 3" should "return an array of doubles based on window size of 3" in {
+                // Given ..
+                val input = (1 to 100).map(_.toDouble).toArray
+                val expected = (2 to 99).map(_.toDouble).toArray
+                // When ..
+                val result = Calculator.getMovingAvg(input, 3)
+                // Then ..
+                assert(result sameElements expected)
+              }
+              }
+              EOF
+            
     We can then create a method to perform a series of maps:
 
         def getMovingAvg(inputValues: Array[Double], windowSize: Int): Array[Double] =
@@ -147,3 +209,27 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
                 .map(_ / windowSize)
                 .toArray
 
+    Now run the tests to make sure they pass:
+
+        sbt test
+    
+10. Tie it all together
+
+    Now that we have our program, it has 3 methods:
+
+    - main()
+    - stringToDoubles()
+    - getMovingAvg()
+    
+    If we modify the `main()` method we can call the 2 subsequent methods to run from the command line.
+    
+    Add the following lines:
+    
+        // Parse the input
+        val data = stringToDoubles(input, delimiter)
+    
+        // Call Calculator.getMovingAvg()
+        val result = getMovingAvg(data, windowSize)
+
+        // Format the output
+        println(result.mkString(delimiter))
