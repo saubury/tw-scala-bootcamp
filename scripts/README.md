@@ -16,7 +16,7 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
     
         root@6be6a0df45c1:/# scala
     
-        Welcome to Scala 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_222).
+        Welcome to Scala 2.13.1 (OpenJDK 64-Bit Server VM, Java 11.0.4).
         Type in expressions for evaluation. Or try :help.
     
         scala>println("Hello")
@@ -30,7 +30,7 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
     - Use var keyword to declare a variable that is mutable
     - Use val keyword to declare a variable that is immutable
     
-    Using val is preferred as they are safer for concurrency and often faster to
+    Using val is preferred as they are safer for concurrency and often faster too.
     
     See explanation from Dick Wall [here](https://drive.google.com/open?id=1QDwUvuXvw9LelKeWS27PQ2XBWuEmzRzi)
 
@@ -102,7 +102,7 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
     
        scalac  HelloWorld2.scala
     
-    Note the additional file, its complicated, but the class with the $ has the concrete implementation.
+    Note the additional file, it's complicated, but the class with the $ has the concrete implementation.
     
        ls -l HelloWorld2*
        -rw-r--r-- 1 root root 637 Nov 28 00:30 'HelloWorld2$.class'
@@ -185,7 +185,7 @@ Before we get started, we want to set the scene with this scenario [Moving Avera
     
 8. Splitting strings
 
-    We first need to start with a test, so lets try:
+    We first need to start with a test, so let's try:
 
        mkdir -p src/test/scala
 
